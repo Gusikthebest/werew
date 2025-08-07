@@ -170,9 +170,10 @@ function UIComponents.CreateTabs(names, size, position, parent)
         table.insert(tabs, tab)
     end
 
-    setmetatable(container, TabsMeta)
     container._activeIndex = activeIndex
     container._tabs = tabs
+
+    setmetatable(container, TabsMeta)
 
     return container, tabs
 end
