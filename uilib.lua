@@ -91,14 +91,14 @@ function UIComponents.CreateDropdown(options, size, position, parent)
         dropdownList.Visible = not dropdownList.Visible
     end)
 
-    -- Фильтрация кликов вне дропдауна (сам управляешь сверху, если нужно)
-    -- Можно расширить дополнительно
+    -- Фильтрация кликов вне дропдауна (управлять снаружи, если нужно)
 
-    -- Событие выбора
+    -- Получить выбранный элемент
     function dropdown:GetSelection()
         return self.Text:gsub(" ▼$", "")
     end
 
+    -- Подключить обработчик изменения выбора
     function dropdown:ConnectSelectionChanged(callback)
         self._onSelectionChanged = callback
     end
@@ -233,6 +233,6 @@ function UIComponents.CreateSlider(size, position, parent)
     return sliderBar
 end
 
--- Добавляй сюда другие элементы по запросу (например, input box, bind button и т.п.)
+-- В дальнейшем можно добавить сюда другие элементы (input box, bind button и т.п.)
 
 return UIComponents
