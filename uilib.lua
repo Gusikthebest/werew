@@ -9,7 +9,7 @@ function UIComponents.CreateButton(text, size, position, parent)
     btn.Size = size or UDim2.new(0, 140, 0, 40)
     btn.Position = position or UDim2.new(0, 0, 0, 0)
     btn.Text = text or "Button"
-    btn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    btn.BackgroundColor3 = Color3.fromRGB(255,255,255)
     btn.TextColor3 = Color3.fromRGB(120, 60, 200)
     btn.Font = Enum.Font.GothamBold
     btn.TextSize = 18
@@ -21,12 +21,12 @@ function UIComponents.CreateButton(text, size, position, parent)
     corner.CornerRadius = UDim.new(0, 12)
 
     btn.MouseButton1Click:Connect(function()
-        TweenService:Create(btn, TweenInfo.new(0.1), { BackgroundColor3 = Color3.fromRGB(220, 180, 255) }):Play()
+        TweenService:Create(btn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(220, 180, 255)}):Play()
         local oldText = btn.Text
         btn.Text = "Clicked!"
         task.wait(0.3)
         btn.Text = oldText
-        TweenService:Create(btn, TweenInfo.new(0.2), { BackgroundColor3 = Color3.fromRGB(255, 255, 255) }):Play()
+        TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255,255,255)}):Play()
     end)
 
     return btn
@@ -38,7 +38,7 @@ function UIComponents.CreateDropdown(options, size, position, parent)
     dropdown.Size = size or UDim2.new(0, 140, 0, 40)
     dropdown.Position = position or UDim2.new(0, 0, 0, 0)
     dropdown.Text = (options[1] or "Select") .. " ▼"
-    dropdown.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    dropdown.BackgroundColor3 = Color3.fromRGB(255,255,255)
     dropdown.TextColor3 = Color3.fromRGB(120, 60, 200)
     dropdown.Font = Enum.Font.Gotham
     dropdown.TextSize = 18
@@ -61,12 +61,13 @@ function UIComponents.CreateDropdown(options, size, position, parent)
     local listCorner = Instance.new("UICorner", dropdownList)
     listCorner.CornerRadius = UDim.new(0, 12)
 
+    local buttons = {}
     for i, option in ipairs(options) do
         local btn = Instance.new("TextButton")
         btn.Size = UDim2.new(1, 0, 0, 36)
-        btn.Position = UDim2.new(0, 0, 0, (i - 1) * 36)
+        btn.Position = UDim2.new(0, 0, 0, (i-1)*36)
         btn.Text = option
-        btn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        btn.BackgroundColor3 = Color3.fromRGB(255,255,255)
         btn.TextColor3 = Color3.fromRGB(120, 60, 200)
         btn.Font = Enum.Font.Gotham
         btn.TextSize = 18
@@ -83,33 +84,24 @@ function UIComponents.CreateDropdown(options, size, position, parent)
                 dropdown._onSelectionChanged(btn.Text)
             end
         end)
+        table.insert(buttons, btn)
     end
 
     dropdown.MouseButton1Click:Connect(function()
         dropdownList.Visible = not dropdownList.Visible
     end)
 
+    -- Получить выбранный элемент
     function dropdown:GetSelection()
         return self.Text:gsub(" ▼$", "")
     end
 
+    -- Подключить обработчик изменения выбора
     function dropdown:ConnectSelectionChanged(callback)
         self._onSelectionChanged = callback
     end
 
     return dropdown
-end
-
--- Метатаблица для табов
-local TabsMeta = {}
-TabsMeta.__index = TabsMeta
-
-function TabsMeta:GetActiveTab()
-    return self._activeIndex or 1
-end
-
-function TabsMeta:ConnectTabChanged(callback)
-    self._onTabChanged = callback
 end
 
 -- === Табы с переключением ===
@@ -121,18 +113,18 @@ function UIComponents.CreateTabs(names, size, position, parent)
     container.Parent = parent
 
     local tabs = {}
-    local activeIndex = 1
+    container._activeIndex = 1 -- теперь это поле контейнера
 
     local tabWidth = (container.Size.X.Offset - (#names - 1) * 10) / #names
 
     local function setActive(index)
-        activeIndex = index
+        container._activeIndex = index -- обновляем поле контейнера
         for i, tab in ipairs(tabs) do
-            tab.BackgroundColor3 = (i == index) and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(180, 140, 255)
-            tab.TextColor3 = (i == index) and Color3.fromRGB(120, 60, 200) or Color3.fromRGB(255, 255, 255)
+            tab.BackgroundColor3 = (i == index) and Color3.fromRGB(255,255,255) or Color3.fromRGB(180,140,255)
+            tab.TextColor3 = (i == index) and Color3.fromRGB(120,60,200) or Color3.fromRGB(255,255,255)
         end
         if container._onTabChanged then
-            container._onTabChanged(activeIndex)
+            container._onTabChanged(container._activeIndex)
         end
     end
 
@@ -141,8 +133,8 @@ function UIComponents.CreateTabs(names, size, position, parent)
         tab.Size = UDim2.new(0, tabWidth, 1, 0)
         tab.Position = UDim2.new(0, (tabWidth + 10) * (i - 1), 0, 0)
         tab.Text = name
-        tab.BackgroundColor3 = (i == activeIndex) and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(180, 140, 255)
-        tab.TextColor3 = (i == activeIndex) and Color3.fromRGB(120, 60, 200) or Color3.fromRGB(255, 255, 255)
+        tab.BackgroundColor3 = (i == container._activeIndex) and Color3.fromRGB(255,255,255) or Color3.fromRGB(180,140,255)
+        tab.TextColor3 = (i == container._activeIndex) and Color3.fromRGB(120,60,200) or Color3.fromRGB(255,255,255)
         tab.Font = Enum.Font.GothamBold
         tab.TextSize = 22
         tab.BorderSizePixel = 0
@@ -153,13 +145,13 @@ function UIComponents.CreateTabs(names, size, position, parent)
         corner.CornerRadius = UDim.new(0, 16)
 
         tab.MouseEnter:Connect(function()
-            if activeIndex ~= i then
-                TweenService:Create(tab, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(220, 180, 255) }):Play()
+            if container._activeIndex ~= i then
+                TweenService:Create(tab, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(220,180,255)}):Play()
             end
         end)
         tab.MouseLeave:Connect(function()
-            if activeIndex ~= i then
-                TweenService:Create(tab, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(180, 140, 255) }):Play()
+            if container._activeIndex ~= i then
+                TweenService:Create(tab, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(180,140,255)}):Play()
             end
         end)
 
@@ -170,10 +162,13 @@ function UIComponents.CreateTabs(names, size, position, parent)
         table.insert(tabs, tab)
     end
 
-    container._activeIndex = activeIndex
-    container._tabs = tabs
+    function container:GetActiveTab()
+        return container._activeIndex -- теперь это поле контейнера
+    end
 
-    setmetatable(container, TabsMeta)
+    function container:ConnectTabChanged(callback)
+        self._onTabChanged = callback
+    end
 
     return container, tabs
 end
@@ -183,7 +178,7 @@ function UIComponents.CreateSlider(size, position, parent)
     local sliderBar = Instance.new("Frame")
     sliderBar.Size = size or UDim2.new(0, 140, 0, 10)
     sliderBar.Position = position or UDim2.new(0, 0, 0, 0)
-    sliderBar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    sliderBar.BackgroundColor3 = Color3.fromRGB(255,255,255)
     sliderBar.BorderSizePixel = 0
     sliderBar.Parent = parent
 
@@ -213,7 +208,7 @@ function UIComponents.CreateSlider(size, position, parent)
     UserInputService.InputChanged:Connect(function(input)
         if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
             local rel = math.clamp((input.Position.X - sliderBar.AbsolutePosition.X) / sliderBar.AbsoluteSize.X, 0, 1)
-            TweenService:Create(sliderFill, TweenInfo.new(0.08), { Size = UDim2.new(rel, 0, 1, 0) }):Play()
+            TweenService:Create(sliderFill, TweenInfo.new(0.08), {Size = UDim2.new(rel, 0, 1, 0)}):Play()
             if sliderBar._onValueChanged then
                 sliderBar._onValueChanged(rel)
             end
@@ -235,5 +230,7 @@ function UIComponents.CreateSlider(size, position, parent)
 
     return sliderBar
 end
+
+-- В дальнейшем можно добавить сюда другие элементы (input box, bind button и т.п.)
 
 return UIComponents
